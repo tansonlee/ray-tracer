@@ -6,3 +6,4 @@ echo $((count+1)) > count.txt
 echo "Starting"
 ./main 1> $filename
 echo "Finished"
+make clean

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "material.h"
 #include "ray.h"
 #include "vec3.h"
 
@@ -12,8 +13,8 @@ struct HitRecord {
   double t;
   // Whether or not we hit the outwards pointing face.
   bool front_face;
-
-  HitRecord() {}
+  // Material hit.
+  std::shared_ptr<Material> material;
 
   void set_face_normal(const Ray& r, const Vec3& outward_normal) {
     front_face = dot(r.get_direction(), outward_normal) < 0;

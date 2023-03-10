@@ -5,7 +5,7 @@
 
 class Sphere : public Hittable {
  public:
-  Sphere(Point3 c, double r);
+  Sphere(Point3 c, double r, std::shared_ptr<Material> m);
   bool hit(const Ray& r,
            double t_min,
            double t_max,
@@ -14,4 +14,5 @@ class Sphere : public Hittable {
  private:
   Point3 center;
   double radius;
+  std::shared_ptr<Material> material;
 };

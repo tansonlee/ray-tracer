@@ -4,6 +4,7 @@
 
 class Ray {
  public:
+  Ray();
   Ray(const Point3 _origin, const Point3 _direction);
 
   Point3 get_origin() const;

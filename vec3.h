@@ -19,6 +19,8 @@ class Vec3 {
   Vec3& operator*=(const double t);
   Vec3& operator/=(const double t);
 
+  bool near_zero() const;
+
  private:
   double x, y, z;
 };
@@ -41,6 +43,8 @@ Vec3 random_vec3(double min, double max);
 Vec3 random_in_unit_sphere();
 Vec3 random_unit_vector();
 Vec3 random_in_hemisphere(const Vec3& normal);
+
+Vec3 reflect(const Vec3& v, const Vec3& n);
 
 using Point3 = Vec3;
 using Color = Vec3;

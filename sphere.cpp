@@ -1,7 +1,8 @@
 #include "sphere.h"
 #include <cmath>
 
-Sphere::Sphere(Point3 c, double r) : center{c}, radius{r} {}
+Sphere::Sphere(Point3 c, double r, std::shared_ptr<Material> m)
+    : center{c}, radius{r}, material{m} {}
 
 bool Sphere::hit(const Ray& r,
                  double t_min,
@@ -30,6 +31,7 @@ bool Sphere::hit(const Ray& r,
   rec.normal = (rec.point - center) / radius;
   Vec3 outward_normal = (rec.point - center) / radius;
   rec.set_face_normal(r, outward_normal);
+  rec.material = this->material;
 
   return true;
 }

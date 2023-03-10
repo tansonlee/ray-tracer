@@ -71,6 +71,11 @@ double Vec3::length() const {
   return sqrt(this->length_squared());
 }
 
+bool Vec3::near_zero() const {
+  const double epsilon = 1e-8;
+  return (fabs(x) < epsilon) && (fabs(y) < epsilon) && (fabs(z) < epsilon);
+}
+
 std::ostream& operator<<(std::ostream& out, const Vec3& v) {
   return out << v.get_x() << " " << v.get_y() << " " << v.get_z() << std::endl;
 }
@@ -148,4 +153,8 @@ Vec3 random_in_hemisphere(const Vec3& normal) {
   } else {
     return -in_unit_sphere;
   }
+}
+
+Vec3 reflect(const Vec3& v, const Vec3& n) {
+  return v - 2 * dot(v, n) * n;
 }

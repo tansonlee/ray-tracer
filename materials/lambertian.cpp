@@ -1,5 +1,5 @@
 #include "lambertian.h"
-#include "hittable.h"
+#include "../hittable.h"
 
 Lambertian::Lambertian(const Color& a) : albedo{a} {}
 

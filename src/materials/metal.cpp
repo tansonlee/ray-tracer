@@ -1,5 +1,5 @@
 #include "metal.h"
-#include "../hittable.h"
+#include "../hittables/hittable.h"
 #include "../ray.h"
 
 Metal::Metal(const Color& a, double f) : albedo{a}, fuzz{f} {}

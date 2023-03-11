@@ -4,12 +4,12 @@
 #include "camera.h"
 #include "color.h"
 #include "helpers.h"
-#include "hittable_list.h"
+#include "hittables/hittable_list.h"
+#include "hittables/sphere.h"
 #include "materials/dielectric.h"
 #include "materials/lambertian.h"
 #include "materials/metal.h"
 #include "ray.h"
-#include "sphere.h"
 #include "vec3.h"
 
 int MAX_DEPTH = 50;

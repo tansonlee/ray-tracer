@@ -1,7 +1,7 @@
 #include "dielectric.h"
 #include <cmath>
 #include "../helpers.h"
-#include "../hittable.h"
+#include "../hittables/hittable.h"
 
 Dielectric::Dielectric(double ior) : index_of_refraction{ior} {}
 

@@ -1,3 +1,0 @@
-/Users/tansonlee/coding/raytracer/build/CMakeFiles/main.dir
-/Users/tansonlee/coding/raytracer/build/CMakeFiles/edit_cache.dir
-/Users/tansonlee/coding/raytracer/build/CMakeFiles/rebuild_cache.dir

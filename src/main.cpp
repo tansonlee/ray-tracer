@@ -21,6 +21,8 @@ const int image_height = static_cast<int>(image_width / aspect_ratio);
 const int total_progress = image_height * image_width;
 int progress = 0;
 
+Color result[image_height][image_width];
+
 double map(double x,
            double in_min,
            double in_max,
@@ -122,10 +124,10 @@ HittableList random_scene() {
   return world;
 }
 
-Color compute_color_for_pixel(int row,
-                              int col,
-                              const Camera& camera,
-                              const HittableList& world) {
+void compute_color_for_pixel(int row,
+                             int col,
+                             const Camera& camera,
+                             const HittableList& world) {
   if (progress % 3600 == 0) {
     std::cerr << "Progress: " << (double)progress / total_progress * 100
               << std::endl;
@@ -144,7 +146,7 @@ Color compute_color_for_pixel(int row,
   }
 
   ++progress;
-  return current_pixel_color;
+  result[row][col] = current_pixel_color;
 }
 
 int main() {
@@ -165,9 +167,14 @@ int main() {
 
   for (int row = image_height - 1; row >= 0; --row) {
     for (int col = 0; col < image_width; ++col) {
-      const Color current_pixel_color =
-          compute_color_for_pixel(row, col, camera, world);
-      write_color(std::cout, current_pixel_color, samples_per_pixel);
+      compute_color_for_pixel(row, col, camera, world);
+    }
+    std::cout << std::endl;
+  }
+
+  for (int row = image_height - 1; row >= 0; --row) {
+    for (int col = 0; col < image_width; ++col) {
+      write_color(std::cout, result[row][col], samples_per_pixel);
     }
     std::cout << std::endl;
   }

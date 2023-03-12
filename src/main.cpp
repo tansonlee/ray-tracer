@@ -169,7 +169,6 @@ int main() {
     for (int col = 0; col < image_width; ++col) {
       compute_color_for_pixel(row, col, camera, world);
     }
-    std::cout << std::endl;
   }
 
   for (int row = image_height - 1; row >= 0; --row) {

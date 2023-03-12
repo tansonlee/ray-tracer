@@ -1,6 +1,8 @@
 #include <cmath>
 #include <iostream>
 #include <memory>
+#include <thread>
+#include <vector>
 #include "camera.h"
 #include "color.h"
 #include "helpers.h"
@@ -14,12 +16,17 @@
 
 int MAX_DEPTH = 50;
 const int samples_per_pixel = 100;
-const auto aspect_ratio = 16.0 / 9.0;
+const double aspect_ratio = 16.0 / 9.0;
 const int image_width = 600;
-const int image_height = static_cast<int>(image_width / aspect_ratio);
+// const int image_height = static_cast<int>(image_width / aspect_ratio);
+const int image_height = 338;
 
 const int total_progress = image_height * image_width;
 int progress = 0;
+
+const int pixels_per_thread = 101400;
+// const int num_threads = ceil(total_progress / pixels_per_thread);
+const int num_threads = 2;
 
 Color result[image_height][image_width];
 
@@ -149,6 +156,18 @@ void compute_color_for_pixel(int row,
   result[row][col] = current_pixel_color;
 }
 
+// Computes pixels in range [start, end)
+void compute_range_of_pixels(int start,
+                             int end,
+                             const Camera& camera,
+                             const HittableList& world) {
+  for (int i = start; i < end; ++i) {
+    int pixel_row = i / image_width;
+    int pixel_col = i % image_width;
+    compute_color_for_pixel(pixel_row, pixel_col, camera, world);
+  }
+}
+
 int main() {
   Point3 lookfrom(13, 2, 3);
   Point3 lookat(0, 0, 0);
@@ -165,10 +184,17 @@ int main() {
   std::cout << image_width << " " << image_height << std::endl;
   std::cout << 255 << std::endl;
 
-  for (int row = image_height - 1; row >= 0; --row) {
-    for (int col = 0; col < image_width; ++col) {
-      compute_color_for_pixel(row, col, camera, world);
-    }
+  std::thread threads[num_threads];
+
+  for (int i = 0; i < num_threads; ++i) {
+    threads[i] = std::thread{
+        compute_range_of_pixels,
+        std::min(i * pixels_per_thread, total_progress),
+        std::min((i + 1) * pixels_per_thread, total_progress), camera, world};
+  }
+
+  for (int i = 0; i < num_threads; ++i) {
+    threads[i].join();
   }
 
   for (int row = image_height - 1; row >= 0; --row) {

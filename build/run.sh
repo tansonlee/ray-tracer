@@ -1,8 +1,12 @@
 # Get the next filename
 count=`cat count.txt`
-filename="../results/image${count}.ppm"
+temp_file=`mktemp`
+full_temp_file="${temp_file}.ppm"
+filename="../results/image${count}.png"
 echo $((count+1)) > count.txt
 
 echo "Starting"
-./main 1> $filename
+./main 1> $full_temp_file
+ffmpeg -i $full_temp_file $filename
 echo "Finished"
+rm $full_temp_file

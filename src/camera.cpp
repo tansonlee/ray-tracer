@@ -1,26 +1,36 @@
 #include "camera.h"
+#include "helpers.h"
 
-Camera::Camera() {
-  double aspect_ratio = 16.0 / 9.0;
-  double viewport_height = 2.0;
+Camera::Camera(Point3 lookfrom,
+               Point3 lookat,
+               Vec3 vup,
+               double vertical_fov_deg,
+               double aspect_ratio,
+               double aperture,
+               double focus_dist) {
+  double theta = degrees_to_radians(vertical_fov_deg);
+  double h = tan(theta / 2);
+  double viewport_height = 2.0 * h;
   double viewport_width = aspect_ratio * viewport_height;
-  double focal_length = 1.0;
 
-  this->origin = Point3(0, 0, 0);
+  w = normalize(lookfrom - lookat);
+  u = normalize(cross(vup, w));
+  v = cross(w, u);
+
+  origin = lookfrom;
   // A vector the length and direction of the width of the viewport.
-  this->horizontal = Vec3(viewport_width, 0.0, 0.0);
+  horizontal = focus_dist * viewport_width * u;
   // A vector the length and direction of the height of the viewport.
-  this->vertical = Vec3(0.0, viewport_height, 0.0);
+  vertical = focus_dist * viewport_height * v;
   // Lower left corner of the viewport.
-  this->lower_left_corner =
-      origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focal_length);
+  lower_left_corner = origin - horizontal / 2 - vertical / 2 - focus_dist * w;
+
+  lens_radius = aperture / 2;
 }
 
-Ray Camera::get_ray(double u, double v) {
-  // Ray starts at the origin.
-  // To get the end of the ray, take the lower left corner then add the
-  // fractional horizontal and vertical components. Subtract the origin from
-  // this to get the ray vector.
-  return Ray(origin,
-             lower_left_corner + u * horizontal + v * vertical - origin);
+Ray Camera::get_ray(double s, double t) const {
+  Vec3 rd = lens_radius * random_in_unit_disk();
+  Vec3 offset = u * rd.get_x() + v * rd.get_y();
+  return Ray(origin + offset, lower_left_corner + s * horizontal +
+                                  t * vertical - origin - offset);
 }

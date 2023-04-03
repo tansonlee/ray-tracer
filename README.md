@@ -2,7 +2,8 @@
 
 # Examples
 
-<img src="/results/scene1.png" />
+<img src="/results/scene1.png" width="400px" />
+<img src="/results/setup.gif" width="400px" />
 
 
 ## Running the project

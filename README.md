@@ -1,6 +1,6 @@
 # Ray Tracer
 
-A ray tracer fitted with features such as multi-threading and camera positioning. It can render multiple materials including metal, glass, and matte surfaces.
+A ray tracer fitted with features such as multi-threading and camera positioning. It can render multiple materials including metal, glass, and matte surfaces. Inspired by "Ray Tracing in One Weekend".
 
 ## Examples
 
@@ -21,5 +21,3 @@ cmake ../CMakeLists.txt
 make
 ./run.sh
 ```
-
-Based on "Ray Tracing in One Weekend"

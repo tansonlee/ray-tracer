@@ -1,5 +1,10 @@
 # Ray Tracer
 
+# Examples
+
+<img src="/results/scene1.png" />
+
+
 ## Running the project
 
 ```bash

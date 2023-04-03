@@ -1,6 +1,8 @@
 # Ray Tracer
 
-# Examples
+A ray tracer fitted with features such as multi-threading and camera positioning. It can render multiple materials including metal, glass, and matte surfaces.
+
+## Examples
 
 Result:
 

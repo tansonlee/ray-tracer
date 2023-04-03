@@ -1,6 +1,6 @@
 # Ray Tracer
 
-A ray tracer equiped with features such as multi-threading and camera positioning. It can render multiple materials including metal, glass, and matte surfaces. Inspired by "Ray Tracing in One Weekend".
+A ray tracer equipped with features such as multi-threading and camera positioning. It can render multiple materials including metal, glass, and matte surfaces. Inspired by "Ray Tracing in One Weekend".
 
 ## Examples
 

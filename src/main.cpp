@@ -14,21 +14,24 @@
 #include "ray.h"
 #include "vec3.h"
 
-int MAX_DEPTH = 50;
-const int samples_per_pixel = 100;
-const double aspect_ratio = 16.0 / 9.0;
-const int image_width = 600;
-// const int image_height = static_cast<int>(image_width / aspect_ratio);
-const int image_height = 338;
+int max_depth;
+int samples_per_pixel;
+double aspect_ratio;
+int image_width;
+int image_height;
 
-const int total_progress = image_height * image_width;
+int total_progress;
 int progress = 0;
 
-const int pixels_per_thread = 101400;
-// const int num_threads = ceil(total_progress / pixels_per_thread);
-const int num_threads = 2;
+Color* result;
 
-Color result[image_height][image_width];
+Color get_result_pixel(int row, int col) {
+  return result[row * image_width + col];
+}
+
+void set_result_pixel(int row, int col, Color val) {
+  result[row * image_width + col] = val;
+}
 
 double map(double x,
            double in_min,
@@ -59,7 +62,7 @@ double hit_sphere(const Point3& center, double radius, const Ray& r) {
 }
 
 Color ray_color(Ray r, HittableList world, int depth) {
-  if (depth > MAX_DEPTH) {
+  if (depth > max_depth) {
     return Color{0, 0, 0};
   }
 
@@ -88,8 +91,6 @@ HittableList random_scene() {
   const int sqrt_num_spheres = 5;
   for (int a = 0; a < sqrt_num_spheres; a++) {
     for (int b = 0; b < sqrt_num_spheres; b++) {
-      // Turn `a` to a number from -11 to 10.
-      // Turn `b` to a number from -11 to 10.
       int x = map(a, 0, sqrt_num_spheres, -6, 6);
       int y = map(b, 0, sqrt_num_spheres, -6, 6);
 
@@ -153,7 +154,8 @@ void compute_color_for_pixel(int row,
   }
 
   ++progress;
-  result[row][col] = current_pixel_color;
+  set_result_pixel(row, col, current_pixel_color);
+  // std::cerr << "finished pixel " << row << " " << col << std::endl;
 }
 
 // Computes pixels in range [start, end)
@@ -168,17 +170,124 @@ void compute_range_of_pixels(int start,
   }
 }
 
+HittableList scene_1() {
+  HittableList world;
+
+  auto ground_material =
+      std::make_shared<Lambertian>(Color(0.3373, 0.4902, 0.2745));
+  world.add(
+      std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
+
+  auto material2 = std::make_shared<Metal>(
+      Color(0.6588235294, 0.662745098, 0.6784313725), 0.5);
+  world.add(std::make_shared<Sphere>(Point3(0, 0.9, 1), 0.9, material2));
+
+  auto material3 =
+      std::make_shared<Lambertian>(Color(1, 0.3254901961, 0.462745098));
+  world.add(std::make_shared<Sphere>(Point3(1.7, 0.7, 2), 0.7, material3));
+
+  auto material4 = std::make_shared<Metal>(Color(1, 0, 0), 0);
+  world.add(std::make_shared<Sphere>(Point3(0, 0.3, 3), 0.3, material4));
+
+  auto material5 = std::make_shared<Dielectric>(1.5);
+  world.add(std::make_shared<Sphere>(Point3(-1, 0.4, 4.8), 0.4, material5));
+
+  auto material6 = std::make_shared<Lambertian>(Color(0, 0, 1));
+  world.add(std::make_shared<Sphere>(Point3(-1.2, 0.13, 3.8), 0.13, material6));
+
+  auto material7 = std::make_shared<Lambertian>(Color(0, 1, 1));
+  world.add(std::make_shared<Sphere>(Point3(-1.5, 0.1, 3.5), 0.1, material7));
+
+  auto material8 = std::make_shared<Metal>(
+      Color(0.6588235294, 0.662745098, 0.6784313725), 0.0);
+  world.add(std::make_shared<Sphere>(Point3(-2.2, 1.5, -1), 1.5, material8));
+
+  for (double x = -8.5; x < -1; x += 0.6) {
+    for (double z = -1.5; z < 5.5; z += 0.6) {
+      double x_offset = random_double(-0.3, 0.3);
+      double z_offset = random_double(-0.3, 0.3);
+      double x_pos = x + x_offset;
+      double z_pos = z + z_offset;
+      if ((x_pos + 2.2) * (x_pos + 2.2) + (z_pos + 1) * (z_pos + 1) < 0.6) {
+        continue;
+      }
+
+      double size = random_double(0.08, 0.14);
+      double material_choice = random_double();
+      if (material_choice < 0.5) {
+        auto material =
+            std::make_shared<Lambertian>(random_vec3() * random_vec3());
+        world.add(std::make_shared<Sphere>(Point3(x_pos, size, z_pos), size,
+                                           material));
+      } else if (material_choice < 0.8) {
+        double fuzz = random_double();
+        auto material =
+            std::make_shared<Metal>(random_vec3() * random_vec3(), fuzz);
+        world.add(std::make_shared<Sphere>(Point3(x_pos, size, z_pos), size,
+                                           material));
+
+      } else {
+        auto material = std::make_shared<Dielectric>(random_double());
+        world.add(std::make_shared<Sphere>(Point3(x_pos, size, z_pos), size,
+                                           material));
+      }
+    }
+  }
+
+  for (double x = -0.3; x < 3.0; x += 0.5) {
+    for (double z = 4.0; z < 7.0; z += 0.5) {
+      double x_offset = random_double(-0.2, 0.2);
+      double z_offset = random_double(-0.2, 0.2);
+
+      double size = random_double(0.08, 0.18);
+      double material_choice = random_double();
+      if (material_choice < 0.5) {
+        auto material =
+            std::make_shared<Lambertian>(random_vec3() * random_vec3());
+        world.add(std::make_shared<Sphere>(
+            Point3(x + x_offset, size, z + z_offset), size, material));
+      } else if (material_choice < 0.8) {
+        double fuzz = random_double();
+        auto material =
+            std::make_shared<Metal>(random_vec3() * random_vec3(), fuzz);
+        world.add(std::make_shared<Sphere>(
+            Point3(x + x_offset, size, z + z_offset), size, material));
+
+      } else {
+        auto material = std::make_shared<Dielectric>(random_double());
+        world.add(std::make_shared<Sphere>(
+            Point3(x + x_offset, size, z + z_offset), size, material));
+      }
+    }
+  }
+
+  return world;
+}
+
 int main() {
-  Point3 lookfrom(13, 2, 3);
-  Point3 lookat(0, 0, 0);
+  max_depth = 30;
+  samples_per_pixel = 500;
+  aspect_ratio = 16.0 / 9.0;
+  image_width = 1200;
+  image_height = static_cast<int>(image_width / aspect_ratio);
+
+  total_progress = image_height * image_width;
+
+  const int num_threads = 8;
+  const int pixels_per_thread = ceil(total_progress / num_threads);
+
+  result = new Color[image_height * image_width];
+
+  Point3 lookfrom(0, 1, 9);
+  Point3 lookat(-0.8, 0, -8);
   Vec3 vup(0, 1, 0);
   auto dist_to_focus = 10.0;
-  auto aperture = 0.1;
+  auto aperture = 0.0;
 
   Camera camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture,
                 dist_to_focus);
 
-  HittableList world = random_scene();
+  HittableList world = scene_1();
 
   std::cout << "P3" << std::endl;
   std::cout << image_width << " " << image_height << std::endl;
@@ -187,6 +296,11 @@ int main() {
   std::thread threads[num_threads];
 
   for (int i = 0; i < num_threads; ++i) {
+    std::cerr << "Thread #" << i << " is computing range from "
+              << std::min(i * pixels_per_thread, total_progress) << " to "
+              << std::min((i + 1) * pixels_per_thread, total_progress)
+              << std::endl;
+
     threads[i] = std::thread{
         compute_range_of_pixels,
         std::min(i * pixels_per_thread, total_progress),
@@ -197,9 +311,11 @@ int main() {
     threads[i].join();
   }
 
+  std::cerr << "Finished computing" << std::endl;
+
   for (int row = image_height - 1; row >= 0; --row) {
     for (int col = 0; col < image_width; ++col) {
-      write_color(std::cout, result[row][col], samples_per_pixel);
+      write_color(std::cout, get_result_pixel(row, col), samples_per_pixel);
     }
     std::cout << std::endl;
   }

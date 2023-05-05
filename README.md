@@ -6,7 +6,7 @@ A ray tracer equipped with features such as multi-threading and camera positioni
 
 Result:
 
-<img src="/results/scene1.png" width="400px" />
+<img src="/results/scene1.png" />
 
 Setup process:
 
